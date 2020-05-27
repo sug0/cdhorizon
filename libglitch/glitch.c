@@ -84,6 +84,7 @@ extern int horizon_Glitch(Image_t *dst, Image_t *const src, horizon_Script *rest
                 }
 
                 output[i-1] = 0xff & lua_tointeger(s->L, -1);
+                dst->set(dst, x, y, &cdst);
             }
         }
     }

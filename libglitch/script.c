@@ -1,5 +1,3 @@
-#include <luajit-2.1/lualib.h>
-#include <luajit-2.1/lauxlib.h>
 #include <time.h>
 #include "script.h"
 #include "priv.h"
@@ -18,7 +16,9 @@ void lua_purgemember(lua_State *L, const char *table, const char *member);
 void lua_opensandbox(lua_State *L);
 
 void horizon_ScriptClose(horizon_Script *restrict s) {
-    lua_close(s->L);
+    if (s->L) {
+        lua_close(s->L);
+    }
 }
 
 int horizon_ScriptCompile(horizon_Script *restrict s, void *src, rfun_t rf) {
