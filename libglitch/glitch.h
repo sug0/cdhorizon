@@ -1,5 +1,5 @@
-#ifndef LIBGLITCH_H
-#define LIBGLITCH_H
+#ifndef LIBGLITCH_GLITCH_H
+#define LIBGLITCH_GLITCH_H
 
 #include <goimg/goimg.h>
 
