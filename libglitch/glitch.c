@@ -5,9 +5,8 @@
 
 int lua_getpixel(lua_State *L);
 
-extern int horizon_Glitch(Image_t *dst, Image_t *const src, horizon_Script *restrict s) {
+extern int horizon_Glitch(Image_t *dst, Image_t *src, horizon_Script *s) {
     int i, x, y, ok = 0;
-    const char *message;
 
     // allocate colors
     Color_t csrc = im_newcolor_from_img(src);
@@ -20,6 +19,9 @@ extern int horizon_Glitch(Image_t *dst, Image_t *const src, horizon_Script *rest
     lua_pushlightuserdata(s->L, &cdst);
     lua_rawseti(s->L, LUA_REGISTRYINDEX, dstcolor_ref);
 
+    lua_pushlightuserdata(s->L, src);
+    lua_rawseti(s->L, LUA_REGISTRYINDEX, srcimg_ref);
+
     // set constants
     lua_rawgeti(s->L, LUA_REGISTRYINDEX, horizon_ref);
 
@@ -29,6 +31,8 @@ extern int horizon_Glitch(Image_t *dst, Image_t *const src, horizon_Script *rest
 
     lua_pushstring(s->L, "output");
     lua_createtable(s->L, 3, 0);
+    int out_ref = luaL_ref(s->L, LUA_REGISTRYINDEX);
+    lua_rawgeti(s->L, LUA_REGISTRYINDEX, out_ref);
     lua_settable(s->L, -3);
 
     lua_pushstring(s->L, "ctx");
@@ -36,11 +40,11 @@ extern int horizon_Glitch(Image_t *dst, Image_t *const src, horizon_Script *rest
     lua_settable(s->L, -3);
 
     lua_pushstring(s->L, "width");
-    lua_pushinteger(s->L, 0);
+    lua_pushinteger(s->L, src->w);
     lua_settable(s->L, -3);
 
     lua_pushstring(s->L, "height");
-    lua_pushinteger(s->L, 0);
+    lua_pushinteger(s->L, src->h);
     lua_settable(s->L, -3);
 
     uint8_t *output = (uint8_t *)cdst.color;
@@ -59,45 +63,36 @@ extern int horizon_Glitch(Image_t *dst, Image_t *const src, horizon_Script *rest
             // call into lua
             lua_rawgeti(s->L, LUA_REGISTRYINDEX, main_ref);
             ok = lua_pcall(s->L, 0, 0, 0);
-            if (!ok) {
+            if (ok != 0) {
+                ok = 1;
                 goto done;
             }
+            lua_pop(s->L, 1);
 
             // update colors
-            lua_pushstring(s->L, "output");
-            lua_gettable(s->L, -2);
-
-            if (!lua_istable(s->L, -1)) {
-                message = "output is not a table";
-                goto error;
-            } else if (lua_objlen(s->L, -1) != 3) {
-                message = "output table has to have size 3";
-                goto error;
-            }
+            lua_rawgeti(s->L, LUA_REGISTRYINDEX, out_ref);
 
             for (i = 1; i < 4; i++) {
                 lua_rawgeti(s->L, -1, i);
 
                 if (!lua_isnumber(s->L, -1)) {
-                    message = "not a number";
-                    goto error;
+                    ok = 2;
+                    goto done;
                 }
 
                 output[i-1] = 0xff & lua_tointeger(s->L, -1);
-                dst->set(dst, x, y, &cdst);
+                lua_pop(s->L, 1);
             }
+
+            dst->set(dst, x, y, &cdst);
         }
     }
 
 done:
+    luaL_unref(s->L, LUA_REGISTRYINDEX, out_ref);
     im_xfree(im_std_allocator, csrc.color);
     im_xfree(im_std_allocator, cdst.color);
     return ok;
-
-error:
-    im_xfree(im_std_allocator, csrc.color);
-    im_xfree(im_std_allocator, cdst.color);
-    return luaL_error(s->L, message);;
 }
 
 int lua_getpixel(lua_State *L) {
@@ -120,6 +115,7 @@ int lua_getpixel(lua_State *L) {
 
     Color_t *src = (Color_t *)lua_touserdata(L, -2);
     Color_t *dst = (Color_t *)lua_touserdata(L, -1);
+    lua_pop(L, 5);
 
     img->at(img, x, y, src);
     im_colormodel_rgb(dst, src);

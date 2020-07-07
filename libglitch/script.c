@@ -35,6 +35,7 @@ int horizon_ScriptCompile(horizon_Script *restrict s, void *src, rfun_t rf) {
     int ok = lua_load(s->L, luaread, &reader, "main");
     if (ok != 0) {
         lua_close(s->L);
+        s->L = NULL;
         return -1;
     }
     luaL_ref(s->L, LUA_REGISTRYINDEX);
@@ -65,8 +66,8 @@ int horizon_ScriptCompile(horizon_Script *restrict s, void *src, rfun_t rf) {
 void lua_opensandbox(lua_State *L) {
     // open base lib
     luaopen_base(L);
-    lua_purgeglobal(L, "rawget");
-    lua_purgeglobal(L, "rawset");
+    //lua_purgeglobal(L, "rawget");
+    //lua_purgeglobal(L, "rawset");
     lua_purgeglobal(L, "setfenv");
     lua_purgeglobal(L, "getfenv");
     lua_purgeglobal(L, "loadfile");
@@ -75,6 +76,7 @@ void lua_opensandbox(lua_State *L) {
     lua_purgeglobal(L, "dofile");
     lua_purgeglobal(L, "collectgarbage");
     lua_purgeglobal(L, "gcinfo");
+    lua_purgeglobal(L, "print");
     lua_purgeglobal(L, "_VERSION");
     lua_purgeglobal(L, "_G");
 
@@ -90,6 +92,7 @@ void lua_opensandbox(lua_State *L) {
     lua_pushinteger(L, time(NULL));
     lua_call(L, 1, 0);
     lua_purgemember(L, "math", "randomseed");
+    lua_settop(L, 0);
 }
 
 const char *luaread(lua_State *L, void *data, size_t *size) {
