@@ -3,7 +3,7 @@
 #include <fcntl.h>
 #include <arg.h>
 //#include <cdhorizon/glitch.h>
-#include "glitch.h"
+#include "../glitch.h"
 
 void usage(char *argv0, int code) {
     fprintf(stderr,
