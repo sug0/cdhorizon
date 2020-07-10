@@ -1,13 +1,14 @@
+#include <string.h>
+#include <luajit-2.1/lua.h>
 #include <luajit-2.1/lualib.h>
 #include <luajit-2.1/lauxlib.h>
 #include "glitch.h"
 #include "priv.h"
 
 int lua_getpixel(lua_State *L);
+int lua_setpixel(lua_State *L);
 
 extern int horizon_Glitch(Image_t *dst, Image_t *src, horizon_Script *s) {
-    int i, x, y, ok = 0;
-
     // allocate colors
     Color_t csrc = im_newcolor_from_img(src);
     Color_t cdst = im_newcolor_rgb();
@@ -22,6 +23,9 @@ extern int horizon_Glitch(Image_t *dst, Image_t *src, horizon_Script *s) {
     lua_pushlightuserdata(s->L, src);
     lua_rawseti(s->L, LUA_REGISTRYINDEX, srcimg_ref);
 
+    lua_pushlightuserdata(s->L, dst);
+    lua_rawseti(s->L, LUA_REGISTRYINDEX, dstimg_ref);
+
     // set constants
     lua_rawgeti(s->L, LUA_REGISTRYINDEX, horizon_ref);
 
@@ -29,14 +33,8 @@ extern int horizon_Glitch(Image_t *dst, Image_t *src, horizon_Script *s) {
     lua_pushcfunction(s->L, lua_getpixel);
     lua_settable(s->L, -3);
 
-    lua_pushstring(s->L, "output");
-    lua_createtable(s->L, 3, 0);
-    int out_ref = luaL_ref(s->L, LUA_REGISTRYINDEX);
-    lua_rawgeti(s->L, LUA_REGISTRYINDEX, out_ref);
-    lua_settable(s->L, -3);
-
-    lua_pushstring(s->L, "ctx");
-    lua_createtable(s->L, 0, 0);
+    lua_pushstring(s->L, "setpixel");
+    lua_pushcfunction(s->L, lua_setpixel);
     lua_settable(s->L, -3);
 
     lua_pushstring(s->L, "width");
@@ -47,52 +45,65 @@ extern int horizon_Glitch(Image_t *dst, Image_t *src, horizon_Script *s) {
     lua_pushinteger(s->L, src->h);
     lua_settable(s->L, -3);
 
-    uint8_t *output = (uint8_t *)cdst.color;
+    // call into lua
+    lua_rawgeti(s->L, LUA_REGISTRYINDEX, main_ref);
 
-    for (y = 0; y < src->h; y++) {
-        for (x = 0; x < src->w; x++) {
-            // update coords
-            lua_pushstring(s->L, "x");
-            lua_pushinteger(s->L, x);
-            lua_settable(s->L, -3);
-
-            lua_pushstring(s->L, "y");
-            lua_pushinteger(s->L, y);
-            lua_settable(s->L, -3);
-
-            // call into lua
-            lua_rawgeti(s->L, LUA_REGISTRYINDEX, main_ref);
-            ok = lua_pcall(s->L, 0, 0, 0);
-            if (ok != 0) {
-                ok = 1;
-                goto done;
-            }
-            lua_pop(s->L, 1);
-
-            // update colors
-            lua_rawgeti(s->L, LUA_REGISTRYINDEX, out_ref);
-
-            for (i = 1; i < 4; i++) {
-                lua_rawgeti(s->L, -1, i);
-
-                if (!lua_isnumber(s->L, -1)) {
-                    ok = 2;
-                    goto done;
-                }
-
-                output[i-1] = 0xff & lua_tointeger(s->L, -1);
-                lua_pop(s->L, 1);
-            }
-
-            dst->set(dst, x, y, &cdst);
-        }
+    if (lua_pcall(s->L, 0, 0, 0) != 0) {
+        im_xfree(im_std_allocator, csrc.color);
+        im_xfree(im_std_allocator, cdst.color);
+        return 1;
     }
 
-done:
-    luaL_unref(s->L, LUA_REGISTRYINDEX, out_ref);
+    lua_settop(s->L, 0);
     im_xfree(im_std_allocator, csrc.color);
     im_xfree(im_std_allocator, cdst.color);
-    return ok;
+
+    return 0;
+}
+
+int lua_setpixel(lua_State *L) {
+    if (lua_gettop(L) != 3) {
+        return luaL_error(L, "expecting exactly 3 arguments");
+    }
+
+    // check types
+    luaL_checktype(L, -1, LUA_TTABLE);
+
+    if (lua_objlen(L, -1) != 3) {
+        return luaL_error(L, "expecting table with 3 numbers as pixel");
+    }
+
+    const int y = luaL_checkinteger(L, -2);
+    const int x = luaL_checkinteger(L, -3);
+
+    lua_rawgeti(L, -1, 1);
+    lua_rawgeti(L, -2, 2);
+    lua_rawgeti(L, -3, 3);
+
+    const int b = (int)(0xff & luaL_checkinteger(L, -1));
+    const int g = (int)(0xff & luaL_checkinteger(L, -2));
+    const int r = (int)(0xff & luaL_checkinteger(L, -3));
+
+    // fetch image and color
+    lua_rawgeti(L, LUA_REGISTRYINDEX, dstimg_ref);
+    lua_rawgeti(L, LUA_REGISTRYINDEX, dstcolor_ref);
+
+    Image_t *img = (Image_t *)lua_touserdata(L, -2);
+    Color_t *dst = (Color_t *)lua_touserdata(L, -1);
+
+    if (x < 0 || y < 0 || x >= img->w || y >= img->h) {
+        return luaL_error(L, "coords out of bounds");
+    }
+
+    // set the color
+    const int value = r | (g << 8) | (b << 16);
+    memcpy(dst->color, &value, sizeof(RGB_t));
+    img->set(img, x, y, dst);
+
+    // pop off used stuff
+    lua_settop(L, 0);
+
+    return 0;
 }
 
 int lua_getpixel(lua_State *L) {

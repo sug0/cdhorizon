@@ -1,5 +1,9 @@
-local input = horizon.getpixel(horizon.x, horizon.y)
+local width  = horizon.width - 1
+local height = horizon.height - 1
 
-horizon.output[1] = input[1]
-horizon.output[2] = input[2]
-horizon.output[3] = input[3]
+for y=0,height do
+    for x=0,width do
+        local output = horizon.getpixel(x, y)
+        horizon.setpixel(x, y, output)
+    end
+end

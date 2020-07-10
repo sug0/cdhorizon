@@ -1,4 +1,5 @@
 #include <time.h>
+//#include <luajit-2.1/luajit.h>
 #include "script.h"
 #include "priv.h"
 
@@ -44,6 +45,10 @@ int horizon_ScriptCompile(horizon_Script *restrict s, void *src, rfun_t rf) {
     lua_pushlightuserdata(s->L, (void *)1);
     luaL_ref(s->L, LUA_REGISTRYINDEX);
 
+    // create dst image user data
+    lua_pushlightuserdata(s->L, (void *)1);
+    luaL_ref(s->L, LUA_REGISTRYINDEX);
+
     // create src color user data
     lua_pushlightuserdata(s->L, (void *)1);
     luaL_ref(s->L, LUA_REGISTRYINDEX);
@@ -53,7 +58,7 @@ int horizon_ScriptCompile(horizon_Script *restrict s, void *src, rfun_t rf) {
     luaL_ref(s->L, LUA_REGISTRYINDEX);
 
     // create horizon table
-    lua_createtable(s->L, 0, 7);
+    lua_createtable(s->L, 0, 4);
 
     // save horizon table
     luaL_ref(s->L, LUA_REGISTRYINDEX);
@@ -92,6 +97,10 @@ void lua_opensandbox(lua_State *L) {
     lua_pushinteger(L, time(NULL));
     lua_call(L, 1, 0);
     lua_purgemember(L, "math", "randomseed");
+
+    // set jit mode
+    //luaJIT_setmode(L, 0, LUAJIT_MODE_ON);
+
     lua_settop(L, 0);
 }
 

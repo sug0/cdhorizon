@@ -3,8 +3,9 @@
 
 #define main_ref       1
 #define srcimg_ref     2
-#define srccolor_ref   3
-#define dstcolor_ref   4
-#define horizon_ref    5
+#define dstimg_ref     3
+#define srccolor_ref   4
+#define dstcolor_ref   5
+#define horizon_ref    6
 
 #endif
