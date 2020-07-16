@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
         goto done;
     }
 
-    im_initimg_rgb(&dst, src.w, src.h, im_std_allocator);
+    im_initimg_nrgba64(&dst, src.w, src.h, im_std_allocator);
 
     if (horizon_Glitch(&dst, &src, &sc) != 0) {
         fprintf(stderr, "%s: Failed to glitch image\n", argv0);
