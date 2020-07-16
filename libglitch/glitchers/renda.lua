@@ -31,10 +31,11 @@ for y=0,height do
 
         min = math.min(min, g)
         max = math.max(max, g)
+        dif = max - min
 
-        o[1] = bit.band(g, max - min)
-        o[2] = bit.band(g, max - min)
-        o[3] = bit.band(g, max - min)
+        o[1] = bit.band(g, dif)
+        o[2] = bit.band(g, dif)
+        o[3] = bit.band(g, dif)
 
         horizon.setpixel(x, y, o)
     end
