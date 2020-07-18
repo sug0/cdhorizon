@@ -1,0 +1,2 @@
+: foreach *.c |> cc -Wall -O3 -c %f |> %B.o
+: *.o |> ar rcs libglitch.a %f && ranlib libglitch.a |> libglitch.a
