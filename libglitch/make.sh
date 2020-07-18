@@ -6,6 +6,10 @@ usage() {
 
 case $1 in
     build)
+        if ! command -v tup; then
+            echo Error: You need tup installed to build: http://gittup.org/tup/
+            exit 1
+        fi
         tup init 2>/dev/null
         tup
         ;;
