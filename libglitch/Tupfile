@@ -1,4 +1,5 @@
 CC := cc
+CFLAGS := -Wall -O3
 
-: foreach *.c |> $(CC) -Wall -O3 -c %f |> %B.o
+: foreach *.c |> $(CC) $(CFLAGS) -c %f |> %B.o
 : *.o |> ar rcs libglitch.a %f && ranlib libglitch.a |> libglitch.a
