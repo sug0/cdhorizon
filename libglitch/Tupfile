@@ -1,4 +1,4 @@
 include_rules
 
 : foreach *.c |> $(CC) $(CFLAGS) -c %f |> %B.o
-: *.o |> ar rcs libglitch.a %f && ranlib libglitch.a |> libglitch.a <libcdhorizon>
+: *.o |> ar rcs libcdhorizon.a %f && ranlib libcdhorizon.a |> libcdhorizon.a <libcdhorizon>

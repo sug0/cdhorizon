@@ -14,7 +14,7 @@ case $1 in
         tup
         ;;
     clean)
-        rm -f *.o libglitch.a
+        rm -f *.o libcdhorizon.a
         ;;
     *)
         usage
