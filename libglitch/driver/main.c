@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <arg.h>
-//#include <cdhorizon/glitch.h>
+
+#include "arg.h"
 #include "../glitch.h"
 
 void usage(char *argv0, int code) {
