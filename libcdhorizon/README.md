@@ -15,8 +15,8 @@ You can obtain the driver program's usage (from the library's root path) with:
 
 * libgoimg
 * LuaJIT
-* libjpeg (required for driver program)
-* libpng (required for driver program)
+* libjpeg (optional)
+* libpng (optional)
 
 ## Building
 
