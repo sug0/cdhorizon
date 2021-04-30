@@ -3,7 +3,7 @@
 C library used to glitch images with the help of (libgoimg)[https://github.com/sug0/libgoimg]
 and (LuaJIT)[https://bitop.luajit.org/].
 
-# Driver program
+## Driver program
 
 A driver program is included to play around with the library.
 The build script compiles both the library and the driver program.
@@ -11,21 +11,21 @@ You can obtain the driver program's usage (from the library's root path) with:
 
     $ ./driver/cdhorizon
 
-# Dependencies
+## Dependencies
 
 * libgoimg
 * LuaJIT
 * libjpeg (required for driver program)
 * libpng (required for driver program)
 
-# Building
+## Building
 
 Building this project requires (tup)[http://gittup.org/tup/].
 Compile the library with:
 
     $ ./make build
 
-# Lua API
+## Lua API
 
 | Identifier         | Arguments         | Return   | Description                                                           |
 |--------------------|-------------------|----------|-----------------------------------------------------------------------|
