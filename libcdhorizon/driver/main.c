@@ -12,6 +12,11 @@ void usage(char *argv0, int code) {
     exit(code);
 }
 
+void log_errors(void *user, const char *s) {
+    (void)user;
+    fprintf(stderr, "%s\n", s);
+}
+
 int main(int argc, char *argv[]) {
     int err = 0, fin = -1, fout = -1, fe = -1;
     char *argv0, *in = NULL, *out = NULL, *lua = NULL;
@@ -85,7 +90,11 @@ int main(int argc, char *argv[]) {
 
     im_initimg_nrgba64(&dst, src.w, src.h, im_std_allocator);
 
-    if (horizon_Glitch(&dst, &src, &sc) != 0) {
+    horizon_ErrorCtx err_ctx = {
+        .fn = log_errors,
+    };
+
+    if (horizon_GlitchCtx(&err_ctx, &dst, &src, &sc) != 0) {
         fprintf(stderr, "%s: Failed to glitch image\n", argv0);
         err = 1;
         goto done;

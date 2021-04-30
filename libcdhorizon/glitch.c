@@ -9,6 +9,10 @@ int lua_getpixel(lua_State *L);
 int lua_setpixel(lua_State *L);
 
 extern int horizon_Glitch(Image_t *dst, Image_t *src, horizon_Script *s) {
+    return horizon_GlitchCtx(NULL, dst, src, s);
+}
+
+extern int horizon_GlitchCtx(horizon_ErrorCtx *ctx, Image_t *dst, Image_t *src, horizon_Script *s) {
     // allocate colors
     Color_t csrc = im_newcolor_from_img(src);
     Color_t cdst = im_newcolor_rgb();
@@ -47,18 +51,17 @@ extern int horizon_Glitch(Image_t *dst, Image_t *src, horizon_Script *s) {
 
     // call into lua
     lua_rawgeti(s->L, LUA_REGISTRYINDEX, main_ref);
+    int error = lua_pcall(s->L, 0, 0, 0);
 
-    if (lua_pcall(s->L, 0, 0, 0) != 0) {
-        im_xfree(im_std_allocator, csrc.color);
-        im_xfree(im_std_allocator, cdst.color);
-        return 1;
+    if (error != 0 && ctx) {
+        ctx->fn(ctx->data, lua_tostring(s->L, -1));
     }
 
     lua_settop(s->L, 0);
     im_xfree(im_std_allocator, csrc.color);
     im_xfree(im_std_allocator, cdst.color);
 
-    return 0;
+    return error != 0;
 }
 
 int lua_setpixel(lua_State *L) {
