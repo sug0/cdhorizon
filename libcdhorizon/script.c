@@ -1,5 +1,5 @@
 #include <time.h>
-//#include <luajit-2.1/luajit.h>
+#include <luajit-2.1/luajit.h>
 #include "script.h"
 #include "priv.h"
 
@@ -76,10 +76,15 @@ int horizon_ScriptCompileCtx(horizon_ErrorCtx *ctx, horizon_Script *restrict s, 
 }
 
 void lua_opensandbox(lua_State *L) {
-    // open base lib
+    // open libs
     luaopen_base(L);
-    //lua_purgeglobal(L, "rawget");
-    //lua_purgeglobal(L, "rawset");
+    luaopen_table(L);
+    luaopen_string(L);
+    luaopen_bit(L);
+
+    // purge globals
+    lua_purgeglobal(L, "rawget");
+    lua_purgeglobal(L, "rawset");
     lua_purgeglobal(L, "setfenv");
     lua_purgeglobal(L, "getfenv");
     lua_purgeglobal(L, "loadfile");
@@ -92,12 +97,6 @@ void lua_opensandbox(lua_State *L) {
     lua_purgeglobal(L, "_VERSION");
     lua_purgeglobal(L, "_G");
 
-    // open bit
-    luaopen_bit(L);
-
-    // open table
-    luaopen_table(L);
-
     // open math
     luaopen_math(L);
     lua_getmember(L, "math", "randomseed");
@@ -106,7 +105,7 @@ void lua_opensandbox(lua_State *L) {
     lua_purgemember(L, "math", "randomseed");
 
     // set jit mode
-    //luaJIT_setmode(L, 0, LUAJIT_MODE_ON);
+    luaJIT_setmode(L, 0, LUAJIT_MODE_ENGINE|LUAJIT_MODE_ON);
 
     lua_settop(L, 0);
 }
