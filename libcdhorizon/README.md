@@ -11,6 +11,12 @@ You can obtain the driver program's usage (from the library's root path) with:
 
     $ ./driver/cdhorizon
 
+The possible output format strings are:
+
+* farbfeld
+* PNG
+* JPEG
+
 ## Dependencies
 
 * libgoimg
