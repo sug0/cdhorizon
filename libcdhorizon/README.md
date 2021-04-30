@@ -32,8 +32,9 @@ following content:
     CONFIG_CFLAGS=...
     CONFIG_LDFLAGS=...
 
-If you want libpng and/or libjpeg support, creating this file with the
-appropriate `CONFIG_LDFLAGS` is required.
+If you want libpng and/or libjpeg support on the driver program,
+creating this file with the appropriate `CONFIG_LDFLAGS` is required.
+If you're just building the library, you can ignore this step.
 
 ## Lua API
 
