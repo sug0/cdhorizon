@@ -7,7 +7,7 @@
 
 void usage(char *argv0, int code) {
     fprintf(stderr,
-    "Usage: %s -e <lua script> [-i <input file>] [-o <output file>]\n",
+    "Usage: %s -e <lua script> [-f <output format>] [-i <input file>] [-o <output file>]\n",
     argv0);
     exit(code);
 }
@@ -19,7 +19,7 @@ void log_errors(void *user, const char *s) {
 
 int main(int argc, char *argv[]) {
     int err = 0, fin = -1, fout = -1, fe = -1;
-    char *argv0, *in = NULL, *out = NULL, *lua = NULL;
+    char *argv0, *in = NULL, *out = NULL, *lua = NULL, *fmt = NULL;
 
     Image_t src = {.allocator = im_std_allocator};
     Image_t dst = {.allocator = im_std_allocator};
@@ -38,6 +38,9 @@ int main(int argc, char *argv[]) {
         break;
     case 'o':
         out = ARGF();
+        break;
+    case 'f':
+        fmt = ARGF();
         break;
     } ARGEND
 
@@ -100,8 +103,10 @@ int main(int argc, char *argv[]) {
         goto done;
     }
 
-    if (im_encode(&dst, "farbfeld", fdwrite, &fout) < 0) {
-        fprintf(stderr, "%s: Unable to encode '%s' as 'farbfeld'\n", argv0, out ? out : "<stdout>");
+    fmt = fmt ? fmt : "farbfeld";
+
+    if (im_encode(&dst, fmt, fdwrite, &fout) < 0) {
+        fprintf(stderr, "%s: Unable to encode '%s' as '%s'\n", argv0, out ? out : "<stdout>", fmt);
         err = 1;
     }
 
