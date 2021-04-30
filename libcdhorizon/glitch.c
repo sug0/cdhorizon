@@ -1,4 +1,3 @@
-#include <string.h>
 #include <luajit-2.1/lua.h>
 #include <luajit-2.1/lualib.h>
 #include <luajit-2.1/lauxlib.h>
@@ -100,7 +99,8 @@ int lua_setpixel(lua_State *L) {
 
     // set the color
     const int value = r | (g << 8) | (b << 16);
-    memcpy(dst->color, &value, sizeof(RGB_t));
+    RGB_t *const value_p = (RGB_t *const)&value;
+    *(RGB_t *)dst->color = *value_p;
     img->set(img, x, y, dst);
 
     // pop off used stuff
