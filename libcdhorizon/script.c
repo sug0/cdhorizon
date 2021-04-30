@@ -23,6 +23,10 @@ void horizon_ScriptClose(horizon_Script *restrict s) {
 }
 
 int horizon_ScriptCompile(horizon_Script *restrict s, void *src, rfun_t rf) {
+    return horizon_ScriptCompileCtx(NULL, s, src, rf);
+}
+
+int horizon_ScriptCompileCtx(horizon_ErrorCtx *ctx, horizon_Script *restrict s, void *src, rfun_t rf) {
     s->L = luaL_newstate();
 
     // open our sandbox env libs
@@ -35,6 +39,9 @@ int horizon_ScriptCompile(horizon_Script *restrict s, void *src, rfun_t rf) {
     };
     int ok = lua_load(s->L, luaread, &reader, "main");
     if (ok != 0) {
+        if (ctx) {
+            ctx->fn(ctx->data, lua_tostring(s->L, -1));
+        }
         lua_close(s->L);
         s->L = NULL;
         return -1;

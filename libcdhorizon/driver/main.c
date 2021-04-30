@@ -74,7 +74,11 @@ int main(int argc, char *argv[]) {
         .bufsz = sizeof(buf),
     };
 
-    if (horizon_ScriptCompile(&sc, &bufr, rbufread) != 0) {
+    horizon_ErrorCtx err_ctx = {
+        .fn = log_errors,
+    };
+
+    if (horizon_ScriptCompileCtx(&err_ctx, &sc, &bufr, rbufread) != 0) {
         fprintf(stderr, "%s: Unable to compile lua script: %s\n", argv0, lua);
         err = 1;
         goto done;
@@ -89,10 +93,6 @@ int main(int argc, char *argv[]) {
     }
 
     im_initimg_nrgba64(&dst, src.w, src.h, im_std_allocator);
-
-    horizon_ErrorCtx err_ctx = {
-        .fn = log_errors,
-    };
 
     if (horizon_GlitchCtx(&err_ctx, &dst, &src, &sc) != 0) {
         fprintf(stderr, "%s: Failed to glitch image\n", argv0);
