@@ -25,6 +25,12 @@ Compile the library with:
 
     $ ./make build
 
+To change the `CFLAGS` or `CC`, create a `tup.config` file with the
+following content:
+
+    CONFIG_CC=...
+    CONFIG_CFLAGS=...
+
 ## Lua API
 
 | Identifier         | Arguments         | Return   | Description                                                           |

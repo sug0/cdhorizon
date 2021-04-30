@@ -1,2 +1,11 @@
+ifdef CC
+CC := @(CC)
+else
 CC := cc
+endif
+
+ifdef CFLAGS
+CFLAGS := @(CFLAGS)
+else
 CFLAGS := -Wall -O3
+endif
