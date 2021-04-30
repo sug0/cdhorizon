@@ -1,7 +1,7 @@
 # libcdhorizon
 
-C library used to glitch images with the help of (libgoimg)[https://github.com/sug0/libgoimg]
-and (LuaJIT)[https://bitop.luajit.org/].
+C library used to glitch images with the help of [libgoimg](https://github.com/sug0/libgoimg)
+and [LuaJIT](https://bitop.luajit.org/).
 
 ## Driver program
 
@@ -20,7 +20,7 @@ You can obtain the driver program's usage (from the library's root path) with:
 
 ## Building
 
-Building this project requires (tup)[http://gittup.org/tup/].
+Building this project requires [tup](http://gittup.org/tup/).
 Compile the library with:
 
     $ ./make build
