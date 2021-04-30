@@ -25,11 +25,15 @@ Compile the library with:
 
     $ ./make build
 
-To change the `CFLAGS` or `CC`, create a `tup.config` file with the
+To change the compilation flags, create a `tup.config` file with the
 following content:
 
     CONFIG_CC=...
     CONFIG_CFLAGS=...
+    CONFIG_LDFLAGS=...
+
+If you want libpng and/or libjpeg support, creating this file with the
+appropriate `CONFIG_LDFLAGS` is required.
 
 ## Lua API
 
