@@ -9,3 +9,9 @@ CFLAGS := @(CFLAGS)
 else
 CFLAGS := -Wall -O3
 endif
+
+LDFLAGS := -lgoimg -lpng -ljpeg -lluajit-5.1
+
+ifdef LDFLAGS
+LDFLAGS += @(LDFLAGS)
+endif
