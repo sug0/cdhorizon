@@ -2,10 +2,14 @@ local width  = horizon.width - 1
 local height = horizon.height - 1
 
 local output = {0, 0, 0}
-local wght   = math.random()
 
 function lerp(x, y, w)
     return (1.0 - w)*x + w*y
+end
+
+local wght = math.random()
+while wght > 0.2 do
+    wght = math.random()
 end
 
 for x=0,width do
