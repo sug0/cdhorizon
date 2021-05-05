@@ -50,6 +50,7 @@ If you're just building the library, you can ignore this step.
 | `horizon.setpixel` | `x`, `y`, `pixel` | N/A      | Takes an input table with the RGB components of the pixel to set.     |
 | `horizon.width`    | N/A               | `width`  | Constant value of the width of the input image.                       |
 | `horizon.height`   | N/A               | `height` | Constant value of the height of the input image.                      |
+| `horizon.params`   | N/A               | `params` | Returns a dynamic table with user defined script param values.        |
 
 Some examples can be found at `glitchers/`. The file `glitchers/id.lua` creates
 an exact replica of the input image, so it is a fine template for new scripts.
