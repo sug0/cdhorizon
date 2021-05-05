@@ -9,6 +9,10 @@ local max = 0
 local pmin = horizon.params.min or 0.3
 local pmax = horizon.params.max or 0.3
 
+local diff = (horizon.params.hi == 1)
+    and function(min, max) return bit.rshift(math.abs(max + min), 1) end
+    or  function(min, max) return math.abs(max + min)/6 + 30 end
+
 for y=0,height do
     for x=0,width do
         local i = horizon.getpixel(x, y)
@@ -17,7 +21,7 @@ for y=0,height do
         min = math.min(min + pmin * math.random(), g)
         max = math.max(max - pmax * math.random(), g)
 
-        dif = math.abs(max + min)/6 + 30
+        dif = diff(min, max)
 
         output[1] = dif
         output[2] = dif
