@@ -78,31 +78,31 @@ int horizon_ScriptCompileCtxParams(
     luaL_ref(s->L, LUA_REGISTRYINDEX);
 
     // create horizon table
-    lua_createtable(s->L, 0, params ? 5 : 4);
+    lua_createtable(s->L, 0, 5);
 
-    if (params) {
-        lua_pushstring(s->L, "params");
-        lua_newtable(s->L);
-        for (;;) {
-            switch (params->kind) {
-            case HORIZON_PARAM_END:
-                goto save;
-            case HORIZON_PARAM_INT:
-                lua_pushstring(s->L, params->key);
-                lua_pushinteger(s->L, params->value.k_int);
-                lua_settable(s->L, -3);
-                break;
-            case HORIZON_PARAM_DOUBLE:
-                lua_pushstring(s->L, params->key);
-                lua_pushnumber(s->L, params->value.k_double);
-                lua_settable(s->L, -3);
-                break;
-            }
-            params++;
+    lua_pushstring(s->L, "params");
+    lua_newtable(s->L);
+
+    while (params) {
+        switch (params->kind) {
+        case HORIZON_PARAM_END:
+            goto save;
+        case HORIZON_PARAM_INT:
+            lua_pushstring(s->L, params->key);
+            lua_pushinteger(s->L, params->value.k_int);
+            lua_settable(s->L, -3);
+            break;
+        case HORIZON_PARAM_DOUBLE:
+            lua_pushstring(s->L, params->key);
+            lua_pushnumber(s->L, params->value.k_double);
+            lua_settable(s->L, -3);
+            break;
         }
-save:
-        lua_settable(s->L, -3);
+        params++;
     }
+
+save:
+    lua_settable(s->L, -3);
 
     // save horizon table
     luaL_ref(s->L, LUA_REGISTRYINDEX);
