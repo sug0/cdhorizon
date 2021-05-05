@@ -52,7 +52,7 @@ local cmp = nil
     or ((horizon.params.sort == 2) and cmppixel_2)
     or ((horizon.params.sort == 3) and cmppixel_3(chan))
     or ((horizon.params.sort == 4) and cmppixel_4)
-    or cmppixel_1 -- default
+    or cmppixel_2 -- default
 
 -- main
 for y=0,height do
