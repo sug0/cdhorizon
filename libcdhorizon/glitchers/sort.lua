@@ -32,10 +32,19 @@ local function cmppixel_2(p, q)
     return yp < yp
 end
 
+-- sort based on a color channel
+local function cmppixel_3(chan)
+    return function(p, q)
+        return p[chan] < q[chan]
+    end
+end
+
+local chan = bit.band(horizon.params.chan or 1, 3)
 local cmp =
     ((horizon.params.sort == 1) and cmppixel_1)
-        or ((horizon.params.sort == 2) and cmppixel_2)
-            or cmppixel_1 -- default
+    or ((horizon.params.sort == 2) and cmppixel_2)
+    or ((horizon.params.sort == 3) and cmppixel_3(chan))
+    or cmppixel_1 -- default
 
 for y=0,height do
     for x=0,width do
