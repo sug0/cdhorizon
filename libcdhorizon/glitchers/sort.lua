@@ -9,7 +9,8 @@ local function clear(tab)
     end
 end
 
-local function cmppixel(p, q)
+-- sort based on pixel int values
+local function cmppixel_1(p, q)
     local pr = p[1]
     local pg = bit.lshift(p[2], 8)
     local pb = bit.lshift(p[3], 16)
@@ -24,12 +25,24 @@ local function cmppixel(p, q)
     return pp < qp
 end
 
+-- sort based on pixel gamma values
+local function cmppixel_2(p, q)
+    local yp = bit.rshift(p[1]*19595 + p[2]*38470 + p[3]*7471 + 0x8000, 24)
+    local yq = bit.rshift(q[1]*19595 + q[2]*38470 + q[3]*7471 + 0x8000, 24)
+    return yp < yp
+end
+
+local cmp =
+    (horizon.params.sort == 1) and cmppixel_1
+        or ((horizon.params.sort == 2) and cmppixel_2)
+            or cmppixel_1 -- default
+
 for y=0,height do
     for x=0,width do
         local input = horizon.getpixel(x, y)
         table.insert(row, input)
     end
-    table.sort(row, cmppixel)
+    table.sort(row, cmp)
     for x=0,width do
         horizon.setpixel(x, y, row[x+1])
     end
