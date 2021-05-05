@@ -35,7 +35,7 @@ int horizon_ScriptCompileCtx(
 }
 
 int horizon_ScriptCompileCtxParams(
-    horizon_Param *restrict params,
+    horizon_Params *restrict params,
     horizon_ErrorCtx *ctx,
     horizon_Script *restrict s,
     void *src, rfun_t rf)
@@ -83,25 +83,22 @@ int horizon_ScriptCompileCtxParams(
     lua_pushstring(s->L, "params");
     lua_newtable(s->L);
 
-    while (params) {
-        switch (params->kind) {
-        case HORIZON_PARAM_END:
-            goto save;
+    for (int i = 0; i < params->len; i++) {
+        horizon_Param *p = &params->list[i];
+        switch (p->kind) {
         case HORIZON_PARAM_INT:
-            lua_pushstring(s->L, params->key);
-            lua_pushinteger(s->L, params->value.k_int);
+            lua_pushstring(s->L, p->key);
+            lua_pushinteger(s->L, p->value.k_int);
             lua_settable(s->L, -3);
             break;
         case HORIZON_PARAM_DOUBLE:
-            lua_pushstring(s->L, params->key);
-            lua_pushnumber(s->L, params->value.k_double);
+            lua_pushstring(s->L, p->key);
+            lua_pushnumber(s->L, p->value.k_double);
             lua_settable(s->L, -3);
             break;
         }
-        params++;
     }
 
-save:
     lua_settable(s->L, -3);
 
     // save horizon table

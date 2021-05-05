@@ -9,7 +9,7 @@
 
 #define PARAMS_MAX  32
 
-static horizon_Param g_params[PARAMS_MAX+1];
+static horizon_Param g_params[PARAMS_MAX];
 
 void usage(char *argv0, int code) {
     fprintf(stderr,
@@ -31,7 +31,7 @@ void log_errors(void *user, const char *s) {
     fprintf(stderr, "%s\n", s);
 }
 
-int parse_params(char *ps) {
+int parse_params(char *ps, horizon_Params *params) {
     int i = 0;
 
     char *st_arg, *st_type;
@@ -60,7 +60,9 @@ int parse_params(char *ps) {
         arg_tok = strtok_r(NULL, " ", &st_arg);
         i++;
     }
-    g_params[i].kind = HORIZON_PARAM_END;
+
+    params->len = i;
+    params->list = g_params;
 
     return i;
 }
@@ -132,13 +134,14 @@ int main(int argc, char *argv[]) {
         .fn = log_errors,
     };
 
-    if (ps && parse_params(ps) == -1) {
+    horizon_Params params = {0};
+    if (ps && parse_params(ps, &params) == -1) {
         fprintf(stderr, "%s: Unable to parse params\n", argv0);
         err = 1;
         goto done;
     }
 
-    if (horizon_ScriptCompileCtxParams(ps ? g_params : NULL, &err_ctx, &sc, &bufr, rbufread) != 0) {
+    if (horizon_ScriptCompileCtxParams(&params, &err_ctx, &sc, &bufr, rbufread) != 0) {
         fprintf(stderr, "%s: Unable to compile lua script: %s\n", argv0, lua);
         err = 1;
         goto done;
