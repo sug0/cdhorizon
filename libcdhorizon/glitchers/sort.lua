@@ -72,6 +72,19 @@ local function pixand(p, q)
     end
 end
 
+local function pixor(p, q)
+    local blend = horizon.params.blend
+    if blend then
+        p[1] = lerp(bit.bor(p[1], q[1]), p[1], blend)
+        p[2] = lerp(bit.bor(p[2], q[2]), p[2], blend)
+        p[3] = lerp(bit.bor(p[3], q[3]), p[3], blend)
+    else
+        p[1] = bit.bor(p[1], q[1])
+        p[2] = bit.bor(p[2], q[2])
+        p[3] = bit.bor(p[3], q[3])
+    end
+end
+
 for y=0,height do
     local row = {}
     for x=0,width do
@@ -84,6 +97,9 @@ for y=0,height do
         if horizon.params['and'] == 1 then
             output = horizon.getpixel(x, y)
             pixand(output, row[x+1])
+        elseif horizon.params['or'] == 1 then
+            output = horizon.getpixel(x, y)
+            pixor(output, row[x+1])
         else
             output = row[x+1]
         end
