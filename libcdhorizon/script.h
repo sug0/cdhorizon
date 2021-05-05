@@ -39,13 +39,16 @@ typedef struct horizon_ErrorCtx {
 extern int horizon_ScriptCompile(horizon_Script *restrict script, void *src, rfun_t rf);
 
 // Compiles a new script from a reader. Errors are reported with `ctx`.
-extern int horizon_ScriptCompileCtx(horizon_ErrorCtx *ctx, horizon_Script *restrict script, void *src, rfun_t rf);
+extern int horizon_ScriptCompileCtx(
+    horizon_ErrorCtx *restrict ctx,
+    horizon_Script *restrict script,
+    void *src, rfun_t rf);
 
 // Compiles a new script from a reader. Errors are reported with `ctx`.
 // This version includes script parameters.
 extern int horizon_ScriptCompileCtxParams(
     horizon_Params *restrict params,
-    horizon_ErrorCtx *ctx,
+    horizon_ErrorCtx *restrict ctx,
     horizon_Script *restrict script,
     void *src, rfun_t rf);
 

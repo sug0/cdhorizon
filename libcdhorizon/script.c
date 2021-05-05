@@ -27,7 +27,7 @@ int horizon_ScriptCompile(horizon_Script *restrict s, void *src, rfun_t rf) {
 }
 
 int horizon_ScriptCompileCtx(
-    horizon_ErrorCtx *ctx,
+    horizon_ErrorCtx *restrict ctx,
     horizon_Script *restrict s,
     void *src, rfun_t rf)
 {
@@ -36,7 +36,7 @@ int horizon_ScriptCompileCtx(
 
 int horizon_ScriptCompileCtxParams(
     horizon_Params *restrict params,
-    horizon_ErrorCtx *ctx,
+    horizon_ErrorCtx *restrict ctx,
     horizon_Script *restrict s,
     void *src, rfun_t rf)
 {
