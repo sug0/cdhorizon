@@ -26,7 +26,20 @@ int horizon_ScriptCompile(horizon_Script *restrict s, void *src, rfun_t rf) {
     return horizon_ScriptCompileCtx(NULL, s, src, rf);
 }
 
-int horizon_ScriptCompileCtx(horizon_ErrorCtx *ctx, horizon_Script *restrict s, void *src, rfun_t rf) {
+int horizon_ScriptCompileCtx(
+    horizon_ErrorCtx *ctx,
+    horizon_Script *restrict s,
+    void *src, rfun_t rf)
+{
+    return horizon_ScriptCompileCtxParams(NULL, NULL, s, src, rf);
+}
+
+int horizon_ScriptCompileCtxParams(
+    horizon_Param *restrict params,
+    horizon_ErrorCtx *ctx,
+    horizon_Script *restrict s,
+    void *src, rfun_t rf)
+{
     s->L = luaL_newstate();
 
     // open our sandbox env libs
@@ -65,8 +78,27 @@ int horizon_ScriptCompileCtx(horizon_ErrorCtx *ctx, horizon_Script *restrict s, 
     luaL_ref(s->L, LUA_REGISTRYINDEX);
 
     // create horizon table
-    lua_createtable(s->L, 0, 4);
+    lua_createtable(s->L, 0, params ? 5 : 4);
 
+    while (params) {
+        switch (params->kind) {
+        case HORIZON_PARAM_END:
+            goto save;
+        case HORIZON_PARAM_INT:
+            lua_pushstring(s->L, params->key);
+            lua_pushinteger(s->L, params->value.k_int);
+            lua_settable(s->L, -3);
+            break;
+        case HORIZON_PARAM_DOUBLE:
+            lua_pushstring(s->L, params->key);
+            lua_pushnumber(s->L, params->value.k_double);
+            lua_settable(s->L, -3);
+            break;
+        }
+        params++;
+    }
+
+save:
     // save horizon table
     luaL_ref(s->L, LUA_REGISTRYINDEX);
     lua_rawgeti(s->L, LUA_REGISTRYINDEX, horizon_ref);
