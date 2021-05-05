@@ -55,6 +55,12 @@ local cmp = nil
     or cmppixel_2 -- default
 
 -- main
+local function pixand(p, q)
+    p[1] = bit.band(p[1], q[1])
+    p[2] = bit.band(p[2], q[2])
+    p[3] = bit.band(p[3], q[3])
+end
+
 for y=0,height do
     local row = {}
     for x=0,width do
@@ -63,6 +69,13 @@ for y=0,height do
     end
     table.sort(row, cmp)
     for x=0,width do
-        horizon.setpixel(x, y, row[x+1])
+        local output = nil
+        if horizon.params['and'] == 1 then
+            output = horizon.getpixel(x, y)
+            pixand(output, row[x+1])
+        else
+            output = row[x+1]
+        end
+        horizon.setpixel(x, y, output)
     end
 end
