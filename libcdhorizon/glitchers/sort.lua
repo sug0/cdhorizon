@@ -1,14 +1,6 @@
 local width  = horizon.width - 1
 local height = horizon.height - 1
 
-local row = {}
-
-local function clear(tab)
-    for k,v in pairs(tab) do
-        tab[k] = nil
-    end
-end
-
 -- sort based on pixel int values
 local function cmppixel_1(p, q)
     local pr = p[1]
@@ -47,6 +39,7 @@ local cmp = nil
     or cmppixel_1 -- default
 
 for y=0,height do
+    local row = {}
     for x=0,width do
         local input = horizon.getpixel(x, y)
         table.insert(row, input)
@@ -55,5 +48,4 @@ for y=0,height do
     for x=0,width do
         horizon.setpixel(x, y, row[x+1])
     end
-    clear(row)
 end
