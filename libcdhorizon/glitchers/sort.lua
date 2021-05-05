@@ -40,8 +40,8 @@ local function cmppixel_3(chan)
 end
 
 local chan = bit.band(horizon.params.chan or 1, 3)
-local cmp =
-    ((horizon.params.sort == 1) and cmppixel_1)
+local cmp = nil
+    or ((horizon.params.sort == 1) and cmppixel_1)
     or ((horizon.params.sort == 2) and cmppixel_2)
     or ((horizon.params.sort == 3) and cmppixel_3(chan))
     or cmppixel_1 -- default
