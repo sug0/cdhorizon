@@ -33,7 +33,7 @@ local function cmppixel_2(p, q)
 end
 
 local cmp =
-    (horizon.params.sort == 1) and cmppixel_1
+    ((horizon.params.sort == 1) and cmppixel_1)
         or ((horizon.params.sort == 2) and cmppixel_2)
             or cmppixel_1 -- default
 
