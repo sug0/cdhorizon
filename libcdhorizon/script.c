@@ -83,6 +83,10 @@ int horizon_ScriptCompileCtxParams(
     lua_pushstring(s->L, "params");
     lua_newtable(s->L);
 
+    if (!params) {
+        goto skip_params;
+    }
+
     for (int i = 0; i < params->len; i++) {
         horizon_Param *p = &params->list[i];
         switch (p->kind) {
@@ -99,6 +103,7 @@ int horizon_ScriptCompileCtxParams(
         }
     }
 
+skip_params:
     lua_settable(s->L, -3);
 
     // save horizon table
