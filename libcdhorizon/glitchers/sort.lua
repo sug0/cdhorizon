@@ -33,11 +33,14 @@ end
 
 -- god sort
 local function cmppixel_4(p, q)
-    local p1 = p[1] * math.pi
-    local q1 = q[1] * math.pi
+    local p3 = p[3] * math.pi
+    local q3 = q[3] * math.pi
 
-    local a = p[2] * math.sin(p1) + q[3] * math.cos(p1)
-    local b = q[2] * math.sin(q1) + q[3] * math.cos(q1)
+    local p1 = p[1] * math.pi + math.cos(p3)
+    local q1 = q[1] * math.pi + math.cos(q3)
+
+    local a = p[2] * math.sin(p1)
+    local b = q[2] * math.sin(q1)
 
     return a < b
 end
