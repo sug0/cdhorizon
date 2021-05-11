@@ -46,6 +46,7 @@ local function cmppixel_4(p, q)
 end
 
 -- params
+local op = horizon.params.op and load('return ' .. horizon.params.op)()
 local chan = bit.band(horizon.params.chan or 1, 3)
 local cmp = nil
     or ((horizon.params.sort == 1) and cmppixel_1)
@@ -59,29 +60,16 @@ local function lerp(x, y, w)
     return (1.0 - w)*x + w*y
 end
 
-local function pixand(p, q)
+local function pixop(p, q)
     local blend = horizon.params.blend
     if blend then
-        p[1] = lerp(bit.band(p[1], q[1]), p[1], blend)
-        p[2] = lerp(bit.band(p[2], q[2]), p[2], blend)
-        p[3] = lerp(bit.band(p[3], q[3]), p[3], blend)
+        p[1] = lerp(op(p[1], q[1]), p[1], blend)
+        p[2] = lerp(op(p[2], q[2]), p[2], blend)
+        p[3] = lerp(op(p[3], q[3]), p[3], blend)
     else
-        p[1] = bit.band(p[1], q[1])
-        p[2] = bit.band(p[2], q[2])
-        p[3] = bit.band(p[3], q[3])
-    end
-end
-
-local function pixor(p, q)
-    local blend = horizon.params.blend
-    if blend then
-        p[1] = lerp(bit.bor(p[1], q[1]), p[1], blend)
-        p[2] = lerp(bit.bor(p[2], q[2]), p[2], blend)
-        p[3] = lerp(bit.bor(p[3], q[3]), p[3], blend)
-    else
-        p[1] = bit.bor(p[1], q[1])
-        p[2] = bit.bor(p[2], q[2])
-        p[3] = bit.bor(p[3], q[3])
+        p[1] = op(p[1], q[1])
+        p[2] = op(p[2], q[2])
+        p[3] = op(p[3], q[3])
     end
 end
 
@@ -94,12 +82,9 @@ for y=0,height do
     table.sort(row, cmp)
     for x=0,width do
         local output = nil
-        if horizon.params['and'] == 1 then
+        if op then
             output = horizon.getpixel(x, y)
-            pixand(output, row[x+1])
-        elseif horizon.params['or'] == 1 then
-            output = horizon.getpixel(x, y)
-            pixor(output, row[x+1])
+            pixop(output, row[x+1])
         else
             output = row[x+1]
         end
