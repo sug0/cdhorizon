@@ -10,11 +10,13 @@ typedef struct horizon_Param {
     enum {
         HORIZON_PARAM_INT,
         HORIZON_PARAM_DOUBLE,
+        HORIZON_PARAM_STRING,
     } kind;
     const char *key;
     union {
         int k_int;
         double k_double;
+        char *k_string;
     } value;
 } horizon_Param;
 

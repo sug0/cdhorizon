@@ -18,9 +18,9 @@ void usage(char *argv0, int code) {
     "    [-p <params>] [-f <output format>] [-i <input file>] [-o <output file>]\n"
     "\n"
     "Notes: The parameters take the form:\n"
-    "    \"<d|i>:<k1>:<v1> <d|i>:<k2>:<v2> ...\", where \"d\" are double parameters,\n"
-    "    \"i\" are integer parameters, \"kn\" is a string name for a particular\n"
-    "    parameter and \"vn\" its value.\n"
+    "    \"<d|i|s>:[k1]:[v1]; <d|i|s>:[k2]:[v2]; ...\", where \"d\" are double parameters,\n"
+    "    \"i\" are integer parameters, \"s\" are string parameters, \"kn\" is a string name\n"
+    "    for a particular parameter and \"vn\" its value.\n"
     "\n",
     argv0);
     exit(code);
@@ -34,12 +34,13 @@ void log_errors(void *user, const char *s) {
 int parse_params(char *ps, horizon_Params *params) {
     int i = 0;
 
-    char *st_arg, *st_type;
-    char *arg_tok = strtok_r(ps, " ", &st_arg);
+    char *st_arg, *st_type, *st_space;
+    char *arg_tok = strtok_r(ps, ";", &st_arg);
 
     while (arg_tok && i < PARAMS_MAX) {
         // extract type-key-value triplet
         char *type = strtok_r(arg_tok, ":", &st_type); if (!type) { return -1; }
+        type = strtok_r(type, " ", &st_space);
         char *key = strtok_r(NULL, ":", &st_type); if (!key) { return -1; }
         char *value = strtok_r(NULL, ":", &st_type); if (!value) { return -1; }
 
@@ -52,6 +53,10 @@ int parse_params(char *ps, horizon_Params *params) {
             g_params[i].kind = HORIZON_PARAM_INT;
             g_params[i].key = key;
             g_params[i].value.k_int = atoi(value);
+        } else if (!strcmp(type, "s")) {
+            g_params[i].kind = HORIZON_PARAM_STRING;
+            g_params[i].key = key;
+            g_params[i].value.k_string = value;
         } else {
             return -1;
         }

@@ -100,6 +100,11 @@ int horizon_ScriptCompileCtxParams(
             lua_pushnumber(s->L, p->value.k_double);
             lua_settable(s->L, -3);
             break;
+        case HORIZON_PARAM_STRING:
+            lua_pushstring(s->L, p->key);
+            lua_pushstring(s->L, p->value.k_string);
+            lua_settable(s->L, -3);
+            break;
         }
     }
 
@@ -128,7 +133,7 @@ void lua_opensandbox(lua_State *L) {
     lua_purgeglobal(L, "getfenv");
     lua_purgeglobal(L, "loadfile");
     lua_purgeglobal(L, "loadstring");
-    lua_purgeglobal(L, "load");
+    //lua_purgeglobal(L, "load");
     lua_purgeglobal(L, "dofile");
     lua_purgeglobal(L, "collectgarbage");
     lua_purgeglobal(L, "gcinfo");
