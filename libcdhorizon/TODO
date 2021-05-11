@@ -1,1 +1,2 @@
 * `horizon.getpixelinto` -- return `nil`, and place the pixel into a table of length 3
+* make string parameters optional during compilation
