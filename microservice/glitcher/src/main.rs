@@ -1,6 +1,7 @@
 use actix_web::{web, App, HttpServer, HttpResponse, Responder};
 use futures_util::{TryStreamExt, StreamExt};
 use actix_multipart::Multipart;
+use enum_map::{Enum, EnumMap};
 use std::default::Default;
 use serde::Serialize;
 
@@ -30,6 +31,13 @@ macro_rules! ok {
     }
 }
 
+#[derive(Enum)]
+enum FieldType {
+    Script,
+    Image,
+    Params,
+}
+
 #[derive(Default, Serialize)]
 struct Response {
     error: Option<String>,
@@ -44,26 +52,35 @@ impl From<String> for Response {
 async fn handler(mut payload: Multipart) -> impl Responder {
     let mut has_script = false;
     let mut has_image = false;
+    let mut has_params = false;
+
+    let mut map = EnumMap::default();
 
     while let Ok(Some(mut field)) = payload.try_next().await {
-        if has_script && has_image {
+        if has_script && has_image && has_params {
             error!("Too many fields in multipart form.");
         }
 
         let disp = some!(field.content_disposition(), "Invalid content disposition.");
         let name = some!(disp.get_name(), "No \"name\" found in multipart.");
 
-        match name {
+        let field_type = match name {
+            "params" if has_params => error!("Duplicate \"params\" field found."),
+            "params" => { has_params = true; FieldType::Params },
             "script" if has_script => error!("Duplicate \"script\" field found."),
-            "script" => has_script = true,
+            "script" => { has_script = true; FieldType::Script },
             "image" if has_image => error!("Duplicate \"image\" field found."),
-            "image" => has_image = true,
+            "image" => { has_image = true; FieldType::Image },
             _ => error!("Invalid multipart field name."),
+        };
+
+        let mut data = Vec::new();
+        while let Some(chunk) = field.next().await {
+            let chunk = ok!(chunk, "Failed decoding multipart data.");
+            data.extend_from_slice(&chunk);
         }
 
-        while let Some(chunk) = field.next().await {
-            let _chunk = ok!(chunk, "Failed decoding multipart data.");
-        }
+        map[field_type] = Some(data);
     }
 
     HttpResponse::Ok().json(Response::default())
