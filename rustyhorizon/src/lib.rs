@@ -10,7 +10,7 @@ pub enum Param {
     Int(i32),
 }
 
-pub struct SliceReader {
+struct SliceReader {
     data: *const u8,
     len: usize,
     ptr: usize,
