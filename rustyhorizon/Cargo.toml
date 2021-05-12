@@ -1,0 +1,5 @@
+[package]
+name = "rustyhorizon"
+version = "0.1.0"
+authors = ["Tiago Carvalho <sugoiuguu@tfwno.gf>"]
+edition = "2018"
