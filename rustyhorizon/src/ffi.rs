@@ -1,71 +1,71 @@
 use std::ffi::c_void;
 
 #[repr(C)]
-struct Allocator {
-    alloc: extern "C" fn(*mut c_void, usize) -> *mut c_void,
-    realloc: extern "C" fn(*mut c_void, *mut c_void, usize) -> *mut c_void,
-    free: extern "C" fn(*mut c_void, *mut c_void),
-    data: *mut c_void,
+pub struct Allocator {
+    pub alloc: extern "C" fn(*mut c_void, usize) -> *mut c_void,
+    pub realloc: extern "C" fn(*mut c_void, *mut c_void, usize) -> *mut c_void,
+    pub free: extern "C" fn(*mut c_void, *mut c_void),
+    pub data: *mut c_void,
 }
 
 #[repr(C)]
-struct RGBA128 {
-    r: u32,
-    g: u32,
-    b: u32,
-    a: u32,
+pub struct RGBA128 {
+    pub r: u32,
+    pub g: u32,
+    pub b: u32,
+    pub a: u32,
 }
 
 #[repr(C)]
-struct Color {
-    allocator: *const Allocator,
-    c_id: i32,
-    color: *mut c_void,
-    size: usize,
-    rgba128: extern "C" fn(*mut RGBA128, *mut c_void),
+pub struct Color {
+    pub allocator: *const Allocator,
+    pub c_id: i32,
+    pub color: *mut c_void,
+    pub size: usize,
+    pub rgba128: extern "C" fn(*mut RGBA128, *mut c_void),
 }
 
 #[repr(C)]
-struct Image {
-    allocator: *const Allocator,
-    img: *mut c_void,
-    size: usize,
-    w: i32,
-    h: i32,
-    color_model: extern "C" fn(*mut Color, *const Color),
-    at: extern "C" fn(*const Image, i32, i32, *mut Color),
-    set: extern "C" fn(*mut Image, i32, i32, *const Color),
+pub struct Image {
+    pub allocator: *const Allocator,
+    pub img: *mut c_void,
+    pub size: usize,
+    pub w: i32,
+    pub h: i32,
+    pub color_model: extern "C" fn(*mut Color, *const Color),
+    pub at: extern "C" fn(*const Image, i32, i32, *mut Color),
+    pub set: extern "C" fn(*mut Image, i32, i32, *const Color),
 }
 
 #[repr(C)]
-struct HorizonErrorCtx {
-    data: *mut c_void,
-    func: extern "C" fn(*mut c_void, *const u8),
+pub struct HorizonErrorCtx {
+    pub data: *mut c_void,
+    pub func: extern "C" fn(*mut c_void, *const u8),
 }
 
 #[repr(C)]
-struct HorizonScript {
-    lua: *mut c_void,
+pub struct HorizonScript {
+    pub lua: *mut c_void,
 }
 
 #[repr(C)]
-union HorizonParamValue {
-    int: i32,
-    double: f64,
-    string: *const u8,
+pub union HorizonParamValue {
+    pub int: i32,
+    pub double: f64,
+    pub string: *const u8,
 }
 
 #[repr(C)]
-struct HorizonParam {
-    kind: i32,
-    key: *const u8,
-    value: HorizonParamValue,
+pub struct HorizonParam {
+    pub kind: i32,
+    pub key: *const u8,
+    pub value: HorizonParamValue,
 }
 
 #[repr(C)]
-struct HorizonParams {
-    len: usize,
-    list: HorizonParam,
+pub struct HorizonParams {
+    pub len: usize,
+    pub list: HorizonParam,
 }
 
 extern "C" {
