@@ -20,7 +20,7 @@ fn main() {
         end
     "#;
 
-    let image = std::env::args().next().unwrap();
+    let image = std::env::args().nth(1).unwrap();
     let image = fs::read(image).unwrap();
     let image = rustyhorizon::run_script(
         script,
