@@ -65,7 +65,7 @@ pub struct HorizonParam {
 #[repr(C)]
 pub struct HorizonParams {
     pub len: usize,
-    pub list: HorizonParam,
+    pub list: *const HorizonParam,
 }
 
 extern "C" {
