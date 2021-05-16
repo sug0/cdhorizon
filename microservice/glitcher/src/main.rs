@@ -1,10 +1,19 @@
-use actix_web::{web, App, HttpServer, HttpResponse, Responder};
+use actix_web::{
+    web,
+    App,
+    Responder,
+    HttpServer,
+    HttpResponse,
+    rt::time::timeout,
+    error::BlockingError,
+};
 use rustyhorizon::{run_script, Param, HorizonError};
 use futures_util::{TryStreamExt, StreamExt};
 use actix_multipart::Multipart;
 use enum_map::{Enum, EnumMap};
 use std::collections::HashMap;
 use std::default::Default;
+use std::time::Duration;
 
 macro_rules! error {
     ($e:expr) => {{
@@ -72,19 +81,29 @@ async fn handler(mut payload: Multipart) -> impl Responder {
         map[field_type] = Some(data);
     }
 
-    let image = some!(&map[FieldType::Image], "Image expected.");
-    let script = some!(&map[FieldType::Script], "Lua script expected.");
-    let params: HashMap<String, Param> = if let Some(params) = &map[FieldType::Params] {
+    let (image, script, params) = {
+        (map[FieldType::Image].take(), map[FieldType::Script].take(), map[FieldType::Params].take())
+    };
+
+    let image = some!(image, "Image expected.");
+    let script = some!(script, "Lua script expected.");
+    let params: HashMap<String, Param> = if let Some(params) = &params {
         ok!(serde_json::from_slice(&params[..]), "Invalid \"params\".")
     } else {
         HashMap::new()
     };
 
-    match run_script(&script[..], &image[..], params) {
+    const MAX_DUR: Duration = Duration::from_secs(3 * 60);
+
+    let future = web::block(move || run_script(&script[..], &image[..], params));
+    let result = ok!(timeout(MAX_DUR, future).await, "Image operation took too long.");
+
+    match result {
         Ok(image) => HttpResponse::Ok().body(image),
-        Err(HorizonError::DecodeErr) => error!("Image decoding failed."),
-        Err(HorizonError::EncodeErr) => error!("Image encoding failed."),
-        Err(HorizonError::InvalidScript(reason)) => error!(reason),
+        Err(BlockingError::Canceled) => error!("Image operation was canceled."),
+        Err(BlockingError::Error(HorizonError::DecodeErr)) => error!("Image decoding failed."),
+        Err(BlockingError::Error(HorizonError::EncodeErr)) => error!("Image encoding failed."),
+        Err(BlockingError::Error(HorizonError::InvalidScript(reason))) => error!(reason),
     }
 }
 
