@@ -32,9 +32,9 @@ pub struct Image {
     pub size: usize,
     pub w: i32,
     pub h: i32,
-    pub color_model: extern "C" fn(*mut Color, *const Color),
-    pub at: extern "C" fn(*const Image, i32, i32, *mut Color),
-    pub set: extern "C" fn(*mut Image, i32, i32, *const Color),
+    pub color_model: Option<extern "C" fn(*mut Color, *const Color)>,
+    pub at: Option<extern "C" fn(*const Image, i32, i32, *mut Color)>,
+    pub set: Option<extern "C" fn(*mut Image, i32, i32, *const Color)>,
 }
 
 #[repr(C)]
@@ -90,6 +90,7 @@ extern "C" {
 
 extern "C" {
     pub fn im_load_defaults();
+    pub fn im_xfree(alloc: *const Allocator, data: *mut c_void);
     pub fn im_decode(img: *mut Image, rfun: Rfun, src: *mut c_void) -> *const ImageFormat;
     pub fn im_encode(img: *const Image, fmt: *const u8, wfun: Wfun, dst: *mut c_void) -> i32;
 
