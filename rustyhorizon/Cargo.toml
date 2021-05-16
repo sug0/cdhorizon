@@ -3,3 +3,9 @@ name = "rustyhorizon"
 version = "0.1.0"
 authors = ["Tiago Carvalho <sugoiuguu@tfwno.gf>"]
 edition = "2018"
+
+[features]
+serde_derive = ["serde"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"], optional = true }

@@ -5,7 +5,11 @@ use std::ffi::c_void;
 use std::sync::Once;
 use std::collections::HashMap;
 
+#[cfg(feature = "serde_derive")]
+use serde::{Serialize, Deserialize};
+
 #[derive(Debug)]
+#[cfg_attr(feature = "serde_derive", derive(Serialize, Deserialize))]
 pub enum HorizonError {
     InvalidScript(String),
     DecodeErr,
