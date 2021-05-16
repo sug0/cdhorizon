@@ -1,15 +1,15 @@
 use actix_web::{web, App, HttpServer, HttpResponse, Responder};
+use rustyhorizon::{run_script, Param, HorizonError};
 use futures_util::{TryStreamExt, StreamExt};
 use actix_multipart::Multipart;
 use enum_map::{Enum, EnumMap};
+use std::collections::HashMap;
 use std::default::Default;
-use serde::Serialize;
 
 macro_rules! error {
     ($e:expr) => {{
-        let payload: String = $e.into();
-        let payload: Response = payload.into();
-        return HttpResponse::BadRequest().json(payload);
+        let payload: Vec<u8> = $e.as_bytes().into();
+        return HttpResponse::BadRequest().body(payload);
     }}
 }
 
@@ -36,17 +36,6 @@ enum FieldType {
     Script,
     Image,
     Params,
-}
-
-#[derive(Default, Serialize)]
-struct Response {
-    error: Option<String>,
-}
-
-impl From<String> for Response {
-    fn from(s: String) -> Self {
-        Self { error: Some(s) }
-    }
 }
 
 async fn handler(mut payload: Multipart) -> impl Responder {
@@ -83,7 +72,20 @@ async fn handler(mut payload: Multipart) -> impl Responder {
         map[field_type] = Some(data);
     }
 
-    HttpResponse::Ok().json(Response::default())
+    let image = some!(&map[FieldType::Image], "Image expected.");
+    let script = some!(&map[FieldType::Script], "Lua script expected.");
+    let params: HashMap<String, Param> = if let Some(params) = &map[FieldType::Params] {
+        ok!(serde_json::from_slice(&params[..]), "Invalid \"params\".")
+    } else {
+        HashMap::new()
+    };
+
+    match run_script(&script[..], &image[..], params) {
+        Ok(image) => HttpResponse::Ok().body(image),
+        Err(HorizonError::DecodeErr) => error!("Image decoding failed."),
+        Err(HorizonError::EncodeErr) => error!("Image encoding failed."),
+        Err(HorizonError::InvalidScript(reason)) => error!(reason),
+    }
 }
 
 #[actix_web::main]
