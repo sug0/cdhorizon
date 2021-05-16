@@ -93,6 +93,7 @@ extern "C" {
     pub fn im_xfree(alloc: *const Allocator, data: *mut c_void);
     pub fn im_decode(img: *mut Image, rfun: Rfun, src: *mut c_void) -> *const ImageFormat;
     pub fn im_encode(img: *const Image, fmt: *const u8, wfun: Wfun, dst: *mut c_void) -> i32;
+    pub fn im_initimg_nrgba(img: *mut Image, w: i32, h: i32, alloc: *const Allocator);
 
     pub fn horizon_ScriptClose(script: *mut HorizonScript);
     pub fn horizon_ScriptCompileCtxParams(
