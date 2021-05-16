@@ -38,6 +38,15 @@ pub struct Image {
 }
 
 #[repr(C)]
+pub struct ImageFormat {
+    pub magic: *const u8,
+    pub magic_size: i32,
+    pub name: *const u8,
+    pub decode: Decfun,
+    pub encode: Encfun,
+}
+
+#[repr(C)]
 pub struct HorizonErrorCtx {
     pub data: *mut c_void,
     pub func: extern "C" fn(*mut c_void, *const u8),
@@ -46,6 +55,13 @@ pub struct HorizonErrorCtx {
 #[repr(C)]
 pub struct HorizonScript {
     pub lua: *mut c_void,
+}
+
+#[repr(i32)]
+pub enum HorizonParamKind {
+    INT = 0,
+    DOUBLE = 1,
+    STRING = 2,
 }
 
 #[repr(C)]
@@ -57,7 +73,7 @@ pub union HorizonParamValue {
 
 #[repr(C)]
 pub struct HorizonParam {
-    pub kind: i32,
+    pub kind: HorizonParamKind,
     pub key: *const u8,
     pub value: HorizonParamValue,
 }
@@ -74,6 +90,9 @@ extern "C" {
 
 extern "C" {
     pub fn im_load_defaults();
+    pub fn im_decode(img: *mut Image, rfun: Rfun, src: *mut c_void) -> *const ImageFormat;
+    pub fn im_encode(img: *const Image, fmt: *const u8, wfun: Wfun, dst: *mut c_void) -> i32;
+
     pub fn horizon_ScriptClose(script: *mut HorizonScript);
     pub fn horizon_ScriptCompileCtxParams(
         params: *const HorizonParams,
@@ -92,3 +111,6 @@ extern "C" {
 
 pub type Rfun = extern "C" fn(*mut c_void, *mut u8, usize) -> i32;
 pub type Wfun = extern "C" fn(*mut c_void, *const u8, usize) -> i32;
+
+pub type Decfun = extern "C" fn(*mut Image, Rfun, *mut c_void) -> i32;
+pub type Encfun = extern "C" fn(*const Image, Wfun, *mut c_void) -> i32;
