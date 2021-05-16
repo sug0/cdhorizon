@@ -20,6 +20,7 @@ fn main() {
     println!("cargo:rustc-link-search=native={}", libcdhorizon_dir.to_str().unwrap());
     println!("cargo:rustc-link-search=native={}", "/usr/local/lib");
     println!("cargo:rustc-link-search=native={}", "/usr/lib");
+    println!("cargo:rustc-link-lib=static={}", "luajit-5.1");
     println!("cargo:rustc-link-lib=static={}", "cdhorizon");
     println!("cargo:rustc-link-lib=static={}", "goimg");
     println!("cargo:rustc-link-lib=static={}", "png");
@@ -28,4 +29,5 @@ fn main() {
     println!("cargo:rustc-link-lib=static={}", "mvec");
     println!("cargo:rustc-link-lib=static={}", "dl");
     println!("cargo:rustc-link-lib=static={}", "z");
+    println!("cargo:rustc-link-lib=static={}", "c");
 }
