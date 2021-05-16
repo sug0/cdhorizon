@@ -9,13 +9,13 @@ use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug)]
-#[cfg_attr(feature = "serde_derive", derive(Serialize, Deserialize))]
 pub enum HorizonError {
     InvalidScript(String),
     DecodeErr,
     EncodeErr,
 }
 
+#[cfg_attr(feature = "serde_derive", derive(Serialize, Deserialize))]
 pub enum Param {
     String(String),
     Double(f64),
