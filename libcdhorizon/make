@@ -14,7 +14,7 @@ case $1 in
         tup
         ;;
     clean)
-        rm -f *.o libcdhorizon.a
+        rm -f *.o libcdhorizon.a driver/cdhorizon
         ;;
     *)
         usage
