@@ -5,6 +5,7 @@ use std::ffi::c_void;
 use std::sync::Once;
 use std::collections::HashMap;
 
+#[derive(Debug)]
 pub enum HorizonError {
     InvalidScript(String),
     DecodeErr,
