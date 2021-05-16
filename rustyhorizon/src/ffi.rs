@@ -37,12 +37,57 @@ struct Image {
     set: extern "C" fn(*mut Image, i32, i32, *const Color),
 }
 
+#[repr(C)]
+struct HorizonErrorCtx {
+    data: *mut c_void,
+    func: extern "C" fn(*mut c_void, *const u8),
+}
+
+#[repr(C)]
+struct HorizonScript {
+    lua: *mut c_void,
+}
+
+#[repr(C)]
+union HorizonParamValue {
+    int: i32,
+    double: f64,
+    string: *const u8,
+}
+
+#[repr(C)]
+struct HorizonParam {
+    kind: i32,
+    key: *const u8,
+    value: HorizonParamValue,
+}
+
+#[repr(C)]
+struct HorizonParams {
+    len: usize,
+    list: HorizonParam,
+}
+
 extern "C" {
     pub static im_std_allocator: *const Allocator;
 }
 
 extern "C" {
     pub fn im_load_defaults();
+    pub fn horizon_ScriptClose(script: *mut HorizonScript);
+    pub fn horizon_ScriptCompileCtxParams(
+        params: *const HorizonParams,
+        ctx: *mut HorizonErrorCtx,
+        script: *mut HorizonScript,
+        src: *mut c_void,
+        rfun: Rfun,
+    ) -> i32;
+    pub fn horizon_GlitchCtx(
+        ctx: *mut HorizonErrorCtx,
+        dst: *mut Image,
+        src: *const Image,
+        script: *mut HorizonScript,
+    ) -> i32;
 }
 
 pub type Rfun = extern "C" fn(*mut c_void, *mut u8, usize) -> i32;
