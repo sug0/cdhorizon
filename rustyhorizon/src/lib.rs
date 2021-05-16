@@ -15,10 +15,14 @@ pub enum HorizonError {
     EncodeErr,
 }
 
+#[derive(Debug)]
 #[cfg_attr(feature = "serde_derive", derive(Serialize, Deserialize))]
 pub enum Param {
+    #[serde(rename = "string")]
     String(String),
+    #[serde(rename = "double")]
     Double(f64),
+    #[serde(rename = "int")]
     Int(i32),
 }
 
@@ -38,6 +42,14 @@ static INIT: Once = Once::new();
 
 pub fn run_script(script: &[u8], image: &[u8], params: HashMap<String, Param>) -> Result<Vec<u8>, HorizonError> {
     unsafe { run_script_unsafe(script, image, params) }
+}
+
+fn get_cstr(arena: &mut Vec<String>, mut s: String) -> *const u8 {
+    // some ptr gymnastics to drop things correctly
+    // and be compatible with c strings
+    s.push_str("\0");
+    arena.push(s);
+    arena[arena.len()-1].as_ptr()
 }
 
 #[inline]
@@ -72,14 +84,19 @@ unsafe fn run_script_unsafe(script: &[u8], image: &[u8], params: HashMap<String,
 
     // convert params to a suitable format
     let mut list = Vec::with_capacity(params.len());
+    let mut str_arena = Vec::with_capacity(params.len());
+
     for (key, value) in params {
-        let key = key.as_ptr();
+        let key = get_cstr(&mut str_arena, key);
         match value {
-            Param::String(s) => list.push(ffi::HorizonParam {
-                key,
-                kind: ffi::HorizonParamKind::STRING,
-                value: ffi::HorizonParamValue { string: s.as_ptr() },
-            }),
+            Param::String(string) => {
+                let string = get_cstr(&mut str_arena, string);
+                list.push(ffi::HorizonParam {
+                    key,
+                    kind: ffi::HorizonParamKind::STRING,
+                    value: ffi::HorizonParamValue { string },
+                });
+            },
             Param::Double(x) => list.push(ffi::HorizonParam {
                 key,
                 kind: ffi::HorizonParamKind::DOUBLE,
@@ -92,6 +109,7 @@ unsafe fn run_script_unsafe(script: &[u8], image: &[u8], params: HashMap<String,
             }),
         }
     }
+
     let params = ffi::HorizonParams { len: list.len(), list: list.as_ptr() };
 
     // compile script

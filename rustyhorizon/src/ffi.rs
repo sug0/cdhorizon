@@ -57,11 +57,11 @@ pub struct HorizonScript {
     pub lua: *mut c_void,
 }
 
-#[repr(i32)]
+#[repr(C)]
 pub enum HorizonParamKind {
-    INT = 0,
-    DOUBLE = 1,
-    STRING = 2,
+    INT,
+    DOUBLE,
+    STRING,
 }
 
 #[repr(C)]
