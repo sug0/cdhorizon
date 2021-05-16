@@ -10,6 +10,7 @@ pub enum Param {
     Int(i32),
 }
 
+#[repr(C)]
 struct SliceReader {
     data: *const u8,
     len: usize,
@@ -26,6 +27,37 @@ pub fn run_script(script: &[u8], image: &[u8], params: HashMap<String, Param>) -
 unsafe fn run_script_unsafe(script: &[u8], image: &[u8], params: HashMap<String, Param>) -> Vec<u8> {
     // init libgoimg image formats
     INIT.call_once(|| ffi::im_load_defaults());
+
+    // convert params to a suitable format
+    let mut list = Vec::with_capacity(params.len());
+    for (key, value) in params {
+        let key = key.as_ptr();
+        match value {
+            Param::String(s) => list.push(ffi::HorizonParam {
+                key,
+                kind: ffi::HorizonParamKind::STRING,
+                value: ffi::HorizonParamValue { string: s.as_ptr() },
+            }),
+            Param::Double(x) => list.push(ffi::HorizonParam {
+                key,
+                kind: ffi::HorizonParamKind::DOUBLE,
+                value: ffi::HorizonParamValue { double: x },
+            }),
+            Param::Int(x) => list.push(ffi::HorizonParam {
+                key,
+                kind: ffi::HorizonParamKind::INT,
+                value: ffi::HorizonParamValue { int: x },
+            }),
+        }
+    }
+    let params = ffi::HorizonParams { len: list.len(), list: list.as_ptr() };
+
+    // script reader
+    let mut reader = SliceReader {
+        data: script.as_ptr(),
+        len: script.len(),
+        ptr: 0,
+    };
 
     unimplemented!()
 }
