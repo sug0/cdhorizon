@@ -39,8 +39,8 @@ int parse_params(char *ps, horizon_Params *params) {
 
     while (arg_tok && i < PARAMS_MAX) {
         // extract type-key-value triplet
-        char *type = strtok_r(arg_tok, ":", &st_type); if (!type) { return -1; }
-        type = strtok_r(type, " ", &st_space);
+        char *type = strtok_r(arg_tok, " ", &st_space); if (!type) { return -1; }
+        type = strtok_r(type, ":", &st_type); 
         char *key = strtok_r(NULL, ":", &st_type); if (!key) { return -1; }
         char *value = strtok_r(NULL, ":", &st_type); if (!value) { return -1; }
 
@@ -61,7 +61,7 @@ int parse_params(char *ps, horizon_Params *params) {
             return -1;
         }
 
-        // next key-value pair
+        // next type-key-value triplet
         arg_tok = strtok_r(NULL, " ", &st_arg);
         i++;
     }
