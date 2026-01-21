@@ -26,21 +26,20 @@ The possible output format strings are:
 
 ## Building
 
-Building this project requires [tup](http://gittup.org/tup/).
 Compile the library with:
 
-    $ ./make build
+    $ make libcdhorizon.a
 
-To change the compilation flags, create a `tup.config` file with the
+And the driver with:
+
+    $ make
+
+To change the compilation flags, create a `config.mk` file with the
 following content:
 
-    CONFIG_CC=...
-    CONFIG_CFLAGS=...
-    CONFIG_LDFLAGS=...
-
-If you want libpng and/or libjpeg support on the driver program,
-creating this file with the appropriate `CONFIG_LDFLAGS` is required.
-If you're just building the library, you can ignore this step.
+    CC=...
+    CFLAGS=...
+    LDFLAGS=...
 
 ## Lua API
 
