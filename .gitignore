@@ -1,4 +1,4 @@
 /*.o
-/.tup
 /libcdhorizon.a
-/tup.config
+/cdhorizon
+/config.mk

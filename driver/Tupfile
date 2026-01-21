@@ -1,3 +1,0 @@
-include_rules
-
-: ../<libcdhorizon> arg.h main.c |> $(CC) $(CFLAGS) -o cdhorizon main.c ../libcdhorizon.a $(LDFLAGS) |> cdhorizon

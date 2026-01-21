@@ -1,3 +1,0 @@
-#!/bin/sh
-./make build >/dev/null || exit 1
-exec ./driver/cdhorizon "$@"

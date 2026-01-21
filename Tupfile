@@ -1,4 +1,0 @@
-include_rules
-
-: foreach *.c |> $(CC) $(CFLAGS) -c %f |> %B.o
-: *.o |> ar rcs libcdhorizon.a %f && ranlib libcdhorizon.a |> libcdhorizon.a <libcdhorizon>
