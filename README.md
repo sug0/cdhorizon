@@ -3,6 +3,11 @@
 C library used to glitch images with the help of [libgoimg](https://github.com/sug0/libgoimg)
 and [LuaJIT](https://bitop.luajit.org/).
 
+## License
+
+This software is licensed under the GNU Affero General Public License v3.0.
+You may obtain a copy of the license text [here](https://www.gnu.org/licenses/agpl-3.0.txt).
+
 ## Driver program
 
 A driver program is included to play around with the library.
